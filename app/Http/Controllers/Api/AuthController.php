@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validasi = Validator::make($request->all(), [
-            "nama" => "required|string",
+            "name" => "required|string",
             "email" => "required|email|unique:users,email",
             "phone" => "required|string|unique:users,phone",
             "image" => "required|image",
