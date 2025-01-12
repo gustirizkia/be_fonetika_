@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validasi = Validator::make($request->all(), [
-            "nama" => "required|string",
+            "name" => "required|string",
             "email" => "required|email|unique:users,email",
             "phone" => "required|string|unique:users,phone",
             "image" => "required|image",
@@ -78,21 +78,51 @@ class AuthController extends Controller
         $artikel = Artikel::where("user_id", $user->id)
             ->select("slug", "nama", "is_publish", "image", "created_at")
             ->paginate(18);
-        // $artikel = $artikel->map(function ($row) {
-
-        //     return [
-        //         "nama" => $row->nama,
-        //         "slug" => $row->slug,
-        //         "is_publish" => $row->is_publish,
-        //         "image" => $row->image,
-        //         "created_at" => $row->created_at,
-        //     ];
-        // });
 
         $user->my_artikel = $artikel;
 
         return response()->json([
             "data" => $user
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $dataValidasi = [
+            "name" => "required|string",
+            "email" => "required|email",
+            "phone" => "required|string",
+            "image" => "image",
+        ];
+
+        $user = User::find(auth("api")->user()->id);
+
+        if ($user->email !== $request->email) {
+            $dataValidasi["email"] = "required|email|unique:users,email";
+        }
+
+        if ($request->phone !== $user->phone) {
+            $dataValidasi["email"] = "required|unique:users,phone";
+        }
+
+        $validasi = Validator::make($request->all(), $dataValidasi);
+
+        if ($validasi->fails()) {
+            return response()->json([
+                "message" => $validasi->errors()->first()
+            ], 422);
+        }
+
+        $data = $request->only("name", "email", "phone", "image");
+
+        if ($request->image) {
+            $data["image"] = url("storage/" . $request->image->store("user", 'public'));
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            "data" => $data
         ]);
     }
 }

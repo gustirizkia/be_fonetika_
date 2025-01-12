@@ -17,6 +17,7 @@ class SeederArtikel extends Seeder
     public function run(): void
     {
 
+
         ArtikelKategori::where("id", ">", 0)->delete();
         Artikel::where("id", ">", 0)->delete();
 

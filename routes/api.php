@@ -33,4 +33,5 @@ Route::get("artikel/{slug}", [ArtikelController::class, "show"]);
 Route::middleware("auth:api")
     ->group(function () {
         Route::get("profile", [AuthController::class, "profile"]);
+        Route::put("profile-update", [AuthController::class, "updateProfile"]);
     });
