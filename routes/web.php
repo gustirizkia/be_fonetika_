@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("token-verify", [DashboardController::class, "tokenVerify"]);
 
+Route::get("login", function () {
+    return redirect("https://fonetika-fe.vercel.app/");
+})->name("login");
 
 Route::middleware("auth")
     ->group(function () {
