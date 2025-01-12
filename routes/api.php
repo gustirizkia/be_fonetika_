@@ -26,12 +26,14 @@ Route::post("login", [AuthController::class, "login"]);
 
 Route::get("home", [HomeController::class, "index"]);
 Route::get("kategori", [HomeController::class, "listKategori"]);
+Route::get("kategori/{slug}", [ArtikelController::class, "detailKategori"]);
 
 Route::get("artikel", [ArtikelController::class, "index"]);
+Route::get("artikelByUser", [ArtikelController::class, "artikelByUser"]);
 Route::get("artikel/{slug}", [ArtikelController::class, "show"]);
 
 Route::middleware("auth:api")
     ->group(function () {
         Route::get("profile", [AuthController::class, "profile"]);
-        Route::put("profile-update", [AuthController::class, "updateProfile"]);
+        Route::post("profile-update", [AuthController::class, "updateProfile"]);
     });
