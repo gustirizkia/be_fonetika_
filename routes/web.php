@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Frontend\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get("token-verify", [DashboardController::class, "tokenVerify"]);
+
+
+Route::middleware("auth")
+    ->group(function () {
+        Route::get("/", [DashboardController::class, "index"])->name("home");
+    });
