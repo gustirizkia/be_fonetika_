@@ -19,6 +19,7 @@ class ArtikelController extends Controller
 
         $artikelTerkait = Artikel::where("kategori_id", $item->kategori_id)
             ->where("id", "!=", $item->id)
+            ->select("slug", "nama", "image", "created_at")
             ->limit(12)
             ->get();
 
