@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Vinkla\Hashids\Facades\Hashids;
 
 class AuthController extends Controller
 {
@@ -70,9 +71,16 @@ class AuthController extends Controller
         ], 422);
     }
 
-    public function profile()
+    public function profile($uuid)
     {
-        $user = User::find(auth("api")->user()->id);
+        $id = Hashids::decode($uuid)[0] ?? null;
+        if (!$id) {
+            return response()->json([
+                'message' => "Data tidak ditemukan"
+            ], 404);
+        }
+
+        $user = User::find($id);
         $artikel = Artikel::where("user_id", $user->id)
             ->select("slug", "nama", "is_publish", "image", "created_at")
             ->paginate(18);

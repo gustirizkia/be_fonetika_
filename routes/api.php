@@ -35,9 +35,11 @@ Route::get("artikel-rekomendasi", [ArtikelUtamaController::class, "rekomendasi"]
 Route::get("artikelByUser", [ArtikelController::class, "artikelByUser"]);
 Route::get("artikel/{slug}", [ArtikelController::class, "show"]);
 
+Route::get("profile/{uuid}", [AuthController::class, "profile"]);
+
 Route::middleware("auth:api")
     ->group(function () {
-        Route::get("profile", [AuthController::class, "profile"]);
+
         Route::post("profile-update", [AuthController::class, "updateProfile"]);
         Route::post("artikel-create", [ArtikelController::class, "create"]);
         Route::post("artikel-update", [ArtikelController::class, "updateArtikel"]);

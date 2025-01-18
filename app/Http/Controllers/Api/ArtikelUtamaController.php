@@ -10,7 +10,9 @@ class ArtikelUtamaController extends Controller
 {
     public function index()
     {
-        $items = ArtikelUtama::with("artikel.kategori")
+        $items = ArtikelUtama::with(["artikel" => function ($query) {
+            return $query->with("kategori", "user");
+        }])
             ->where("tipe", "artikel utama")
             ->get();
 
@@ -26,6 +28,13 @@ class ArtikelUtamaController extends Controller
                         "nama" => $row->artikel->kategori->nama,
                         "created_at" => $row->artikel->kategori->created_at,
                         "updated_at" => $row->artikel->kategori->updated_at,
+                    ],
+                    "user" => [
+                        "name"  => $row->artikel->user->name,
+                        "email" => $row->artikel->user->email,
+                        "phone" => $row->artikel->user->phone,
+                        "created_at" => $row->artikel->user->created_at,
+                        "updated_at" => $row->artikel->user->updated_at,
                     ]
                 ];
             })
@@ -34,7 +43,9 @@ class ArtikelUtamaController extends Controller
 
     public function rekomendasi()
     {
-        $items = ArtikelUtama::with("artikel.kategori")
+        $items = ArtikelUtama::with(["artikel" => function ($query) {
+            return $query->with("kategori", "user");
+        }])
             ->where("tipe", "artikel rekomendasi")
             ->get();
 
@@ -50,6 +61,13 @@ class ArtikelUtamaController extends Controller
                         "nama" => $row->artikel->kategori->nama,
                         "created_at" => $row->artikel->kategori->created_at,
                         "updated_at" => $row->artikel->kategori->updated_at,
+                    ],
+                    "user" => [
+                        "name"  => $row->artikel->user->name,
+                        "email" => $row->artikel->user->email,
+                        "phone" => $row->artikel->user->phone,
+                        "created_at" => $row->artikel->user->created_at,
+                        "updated_at" => $row->artikel->user->updated_at,
                     ]
                 ];
             })

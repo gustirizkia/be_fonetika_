@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Vinkla\Hashids\Facades\Hashids;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -28,7 +29,12 @@ class User extends Authenticatable implements JWTSubject
         "sampul"
     ];
 
-    protected $appends = ["image_url", "sampul_url"];
+    protected $appends = ["image_url", "sampul_url", "uuid"];
+
+    public function getUuidAttribute()
+    {
+        return Hashids::connection('main')->encode($this->id);
+    }
 
     public function getImageUrlAttribute()
     {
