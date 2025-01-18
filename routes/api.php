@@ -36,4 +36,5 @@ Route::middleware("auth:api")
     ->group(function () {
         Route::get("profile", [AuthController::class, "profile"]);
         Route::post("profile-update", [AuthController::class, "updateProfile"]);
+        Route::post("artikel-create", [ArtikelController::class, "create"]);
     });

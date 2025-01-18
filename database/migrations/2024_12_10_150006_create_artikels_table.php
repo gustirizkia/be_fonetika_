@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("keyword");
             $table->longText("content");
             $table->integer("is_publish");
+            $table->dateTime("tanggal_publish")->useCurrent();
             $table->timestamps();
         });
     }

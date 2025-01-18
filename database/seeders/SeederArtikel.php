@@ -18,6 +18,13 @@ class SeederArtikel extends Seeder
     public function run(): void
     {
 
+        User::create([
+            "name" => "User NCT",
+            "email" => "user@nct.com",
+            "phone" => 111,
+            "password" => Hash::make("TeknikHijau1"),
+        ]);
+
 
         ArtikelKategori::where("id", ">", 0)->delete();
         Artikel::where("id", ">", 0)->delete();
@@ -46,6 +53,7 @@ class SeederArtikel extends Seeder
             "parent_id" => $kategori->id
         ]);
 
+<<<<<<< HEAD
         $user = User::create([
             "name" => "user NCT",
             "email" => "user@nct.com",
@@ -54,6 +62,10 @@ class SeederArtikel extends Seeder
             "roles" => "admin"
         ]);
         for ($i = 0; $i < 115; $i++) {
+=======
+        $user = User::first();
+        for ($i = 0; $i < 500; $i++) {
+>>>>>>> df8dc3050f365481fdef3ec6366d33cbd7997708
             $faker = Faker::create('id_ID');
 
             $kategori_random = ArtikelKategori::inRandomOrder()->first();
@@ -62,7 +74,7 @@ class SeederArtikel extends Seeder
                 "nama" => $faker->sentence($nbWords = 8, $variableNbWords = true),
                 "kategori_id" => $kategori_random->id,
                 "keyword" => $faker->sentence($nbWords = 16, $variableNbWords = true),
-                "content" => $faker->sentence($nbWords = 500, $variableNbWords = true),
+                "content" => $faker->sentence($nbWords = 600, $variableNbWords = true),
                 "image" => "images/dummy-artikel.png",
                 "user_id" => $user->id,
                 "is_publish" => 1

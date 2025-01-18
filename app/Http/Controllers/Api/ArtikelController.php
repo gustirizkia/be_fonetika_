@@ -19,6 +19,7 @@ class ArtikelController extends Controller
 
         $artikelTerkait = Artikel::where("kategori_id", $item->kategori_id)
             ->where("id", "!=", $item->id)
+            ->select("slug", "nama", "image", "created_at")
             ->limit(12)
             ->get();
 
@@ -125,7 +126,7 @@ class ArtikelController extends Controller
     {
         $validasi = Validator::make($request->all(), [
             "nama" => "string|required",
-            "kategori_id" => "string|required|exists:artikel_kategoris,slug",
+            "kategori_slug" => "string|required|exists:artikel_kategoris,slug",
             "keyword" => "string|required",
             "content" => "string|required",
             "image" => "image|required",
@@ -137,12 +138,21 @@ class ArtikelController extends Controller
             ], 422);
         }
 
-        $data = $request->only("nama", "keyword", "content", "image", "kategori_id");
+        $data = $request->only("nama", "keyword", "content", "image", "kategori_slug");
 
-        $data["image"] = $request->image("image")->store("artikel", "public");
+        $data["image"] = $request->image->store("artikel", "public");
+
+        $kategori = ArtikelKategori::where("slug", $request->kategori_slug)->first();
+
+        $data['kategori_id'] = $kategori->id;
+        $data["is_publish"] = 1;
+
+        unset($data["kategori_slug"]);
+
+        $data["user_id"] = auth()->user()->id;
 
         $artikel = Artikel::create($data);
 
-        return response()->json($data);
+        return response()->json($artikel);
     }
 }
