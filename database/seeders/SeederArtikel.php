@@ -53,7 +53,6 @@ class SeederArtikel extends Seeder
             "parent_id" => $kategori->id
         ]);
 
-<<<<<<< HEAD
         $user = User::create([
             "name" => "user NCT",
             "email" => "user@nct.com",
@@ -62,10 +61,6 @@ class SeederArtikel extends Seeder
             "roles" => "admin"
         ]);
         for ($i = 0; $i < 115; $i++) {
-=======
-        $user = User::first();
-        for ($i = 0; $i < 500; $i++) {
->>>>>>> df8dc3050f365481fdef3ec6366d33cbd7997708
             $faker = Faker::create('id_ID');
 
             $kategori_random = ArtikelKategori::inRandomOrder()->first();
