@@ -81,6 +81,13 @@ class AuthController extends Controller
         }
 
         $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => "Penulis tidak ditemukan"
+            ], 404);
+        }
+
         $artikel = Artikel::where("user_id", $user->id)
             ->select("slug", "nama", "is_publish", "image", "created_at")
             ->paginate(18);
