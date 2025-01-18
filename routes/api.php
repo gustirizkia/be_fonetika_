@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ArtikelController;
+use App\Http\Controllers\Api\ArtikelUtamaController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HomeController;
 use Illuminate\Http\Request;
@@ -29,6 +30,8 @@ Route::get("kategori", [HomeController::class, "listKategori"]);
 Route::get("kategori/{slug}", [ArtikelController::class, "detailKategori"]);
 
 Route::get("artikel", [ArtikelController::class, "index"]);
+Route::get("artikel-utama", [ArtikelUtamaController::class, "index"]);
+Route::get("artikel-rekomendasi", [ArtikelUtamaController::class, "rekomendasi"]);
 Route::get("artikelByUser", [ArtikelController::class, "artikelByUser"]);
 Route::get("artikel/{slug}", [ArtikelController::class, "show"]);
 
