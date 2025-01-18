@@ -120,4 +120,29 @@ class ArtikelController extends Controller
             ]
         ]);
     }
+
+    public function create(Request $request)
+    {
+        $validasi = Validator::make($request->all(), [
+            "nama" => "string|required",
+            "kategori_id" => "string|required|exists:artikel_kategoris,slug",
+            "keyword" => "string|required",
+            "content" => "string|required",
+            "image" => "image|required",
+        ]);
+
+        if ($validasi->fails()) {
+            return response()->json([
+                "message" => $validasi->errors()->first()
+            ], 422);
+        }
+
+        $data = $request->only("nama", "keyword", "content", "image", "kategori_id");
+
+        $data["image"] = $request->image("image")->store("artikel", "public");
+
+        $artikel = Artikel::create($data);
+
+        return response()->json($data);
+    }
 }

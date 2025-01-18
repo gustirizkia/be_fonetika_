@@ -24,7 +24,21 @@ class User extends Authenticatable implements JWTSubject
         'phone',
         "image",
         'password',
+        "roles",
+        "sampul"
     ];
+
+    protected $appends = ["image_url", "sampul_url"];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image ?? "https://ui-avatars.com/api/?name=$this->name";
+    }
+
+    public function getSampulUrlAttribute()
+    {
+        return $this->sampul ?? url("storage/images/sampul.jpg");
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -34,7 +48,9 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        "id"
+        "id",
+        "image",
+        "sampul"
     ];
 
     /**

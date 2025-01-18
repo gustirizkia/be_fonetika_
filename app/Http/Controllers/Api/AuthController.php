@@ -17,7 +17,6 @@ class AuthController extends Controller
             "name" => "required|string",
             "email" => "required|email|unique:users,email",
             "phone" => "required|string|unique:users,phone",
-            "image" => "required|image",
             "password" => "required|string|min:8",
         ]);
 
@@ -29,7 +28,6 @@ class AuthController extends Controller
 
         $data = $request->all();
         $data["password"] = Hash::make($request->password);
-        $data["image"] = url("storage/" . $request->image->store("user", 'public'));
 
         $user = User::create($data);
 
@@ -88,20 +86,15 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $dataValidasi = [
-            "name" => "required|string",
-            "email" => "required|email",
-            "phone" => "required|string",
-            "image" => "image",
-        ];
+        $dataValidasi = [];
 
         $user = User::find(auth("api")->user()->id);
 
-        if ($user->email !== $request->email) {
+        if ($user->email !== $request->email && $request->email !== null) {
             $dataValidasi["email"] = "required|email|unique:users,email";
         }
 
-        if ($request->phone !== $user->phone) {
+        if ($request->phone !== $user->phone && $request->phone !== null) {
             $dataValidasi["email"] = "required|unique:users,phone";
         }
 
@@ -113,16 +106,20 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $data = $request->only("name", "email", "phone", "image");
+        $data = $request->only("name", "email", "phone", "image", "sampul", "bio");
 
         if ($request->image) {
-            $data["image"] = url("storage/" . $request->image->store("user", 'public'));
+            $data["image"] = $request->image->store("user", 'public');
+        }
+
+        if ($request->sampul) {
+            $data["sampul"] = $request->sampul->store("user", 'public');
         }
 
         $user->update($data);
 
         return response()->json([
-            "data" => $data
+            "data" => $user
         ]);
     }
 }

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 class SeederArtikel extends Seeder
 {
@@ -45,7 +46,13 @@ class SeederArtikel extends Seeder
             "parent_id" => $kategori->id
         ]);
 
-        $user = User::first();
+        $user = User::create([
+            "name" => "user NCT",
+            "email" => "user@nct.com",
+            "password" => Hash::make("TeknikHijau1"),
+            "phone" => 01,
+            "roles" => "admin"
+        ]);
         for ($i = 0; $i < 115; $i++) {
             $faker = Faker::create('id_ID');
 
