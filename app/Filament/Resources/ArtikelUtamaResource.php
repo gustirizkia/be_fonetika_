@@ -55,7 +55,7 @@ class ArtikelUtamaResource extends Resource
                     ->label("Tanggal dibuat")->sortable(),
             ])
             ->modifyQueryUsing(function (Builder $query) {
-                return $query->where("tipe", "artikel rekomendasi");
+                return $query->where("tipe", "artikel utama");
             })
             ->filters([
                 //
