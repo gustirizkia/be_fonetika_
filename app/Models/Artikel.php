@@ -45,5 +45,10 @@ class Artikel extends Model
 
             $model->slug = Str::slug($model->nama);
         });
+
+        //while updating item in db
+        static::updating(function ($model) {
+            $model->slug = Str::slug($model->nama);
+        });
     }
 }

@@ -155,4 +155,51 @@ class ArtikelController extends Controller
 
         return response()->json($artikel);
     }
+
+    public function updateArtikel(Request $request)
+    {
+        $validasi = Validator::make($request->all(), [
+            "artikel_slug" => "required|exists:artikels,slug",
+            "kategori_slug" => "string|required|exists:artikel_kategoris,slug",
+        ]);
+
+        $data = $request->only("nama", "keyword", 'content');
+
+        if ($request->image) {
+            $validasi["image"] = "image|required";
+            $data["image"] = $request->image->store("artikel", "public");
+        }
+
+        if ($validasi->fails()) {
+            return response()->json([
+                "message" => $validasi->errors()->first()
+            ], 422);
+        }
+
+        $kategori = ArtikelKategori::where("slug", $request->kategori_slug)->first();
+
+        $data['kategori_id'] = $kategori->id;
+
+        $artikel = Artikel::where("slug", $request->artikel_slug)->first();
+
+        $artikel->update($data);
+
+        return response()->json($artikel);
+    }
+
+    public function hapus($slug)
+    {
+        $artikel = Artikel::where("slug", $slug)->first();
+        if (!$artikel) {
+            return response()->json([
+                "message" => "Artikel tidak ditemukan"
+            ], 422);
+        }
+
+        $artikel->delete();
+
+        return response()->json([
+            "message" => "Berhasil hapus artikel"
+        ]);
+    }
 }

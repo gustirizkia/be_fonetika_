@@ -37,4 +37,6 @@ Route::middleware("auth:api")
         Route::get("profile", [AuthController::class, "profile"]);
         Route::post("profile-update", [AuthController::class, "updateProfile"]);
         Route::post("artikel-create", [ArtikelController::class, "create"]);
+        Route::post("artikel-update", [ArtikelController::class, "updateArtikel"]);
+        Route::delete("artikel-delete/{slug}", [ArtikelController::class, "hapus"]);
     });
