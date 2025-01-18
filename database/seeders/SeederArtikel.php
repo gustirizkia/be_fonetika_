@@ -18,13 +18,6 @@ class SeederArtikel extends Seeder
     public function run(): void
     {
 
-        User::create([
-            "name" => "User NCT",
-            "email" => "user@nct.com",
-            "phone" => 111,
-            "password" => Hash::make("TeknikHijau1"),
-        ]);
-
 
         ArtikelKategori::where("id", ">", 0)->delete();
         Artikel::where("id", ">", 0)->delete();
