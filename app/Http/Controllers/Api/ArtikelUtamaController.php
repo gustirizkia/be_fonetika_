@@ -35,7 +35,7 @@ class ArtikelUtamaController extends Controller
     public function rekomendasi()
     {
         $items = ArtikelUtama::with("artikel.kategori")
-            ->where("tipe", "artikel rekomendasi")
+            ->where("tipe", "artikel utama")
             ->get();
 
         return response()->json([
