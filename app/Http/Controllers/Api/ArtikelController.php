@@ -158,17 +158,19 @@ class ArtikelController extends Controller
 
     public function updateArtikel(Request $request)
     {
-        $validasi = Validator::make($request->all(), [
+        $dataValidasi = [
             "artikel_slug" => "required|exists:artikels,slug",
             "kategori_slug" => "string|required|exists:artikel_kategoris,slug",
-        ]);
+        ];
 
         $data = $request->only("nama", "keyword", 'content');
 
         if ($request->image) {
-            $validasi["image"] = "image|required";
+            $dataValidasi["image"] = "image|required";
             $data["image"] = $request->image->store("artikel", "public");
         }
+
+        $validasi = Validator::make($request->all(), $dataValidasi);
 
         if ($validasi->fails()) {
             return response()->json([

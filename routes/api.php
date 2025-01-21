@@ -3,8 +3,10 @@
 use App\Http\Controllers\Api\ArtikelController;
 use App\Http\Controllers\Api\ArtikelUtamaController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FollowersController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\KomentarController;
+use App\Http\Controllers\Api\PasswordResetController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,9 +42,16 @@ Route::get("profile/{uuid}", [AuthController::class, "profile"]);
 
 Route::get("komentar-by-artikel/{slug}", [KomentarController::class, "komentarByArtikel"]);
 
+Route::get("followers-by-user", [FollowersController::class, "byUser"]);
+
+Route::post('/request-code', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
+
 Route::middleware("auth:api")
     ->group(function () {
         Route::post("komentar-create", [KomentarController::class, "create"]);
+
+        Route::post("followers-create", [FollowersController::class, "create"]);
 
         Route::post("profile-update", [AuthController::class, "updateProfile"]);
         Route::post("artikel-create", [ArtikelController::class, "create"]);

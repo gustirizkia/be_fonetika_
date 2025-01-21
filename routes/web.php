@@ -21,7 +21,9 @@ Route::get("login", function () {
     return redirect("https://fonetika-fe.vercel.app/");
 })->name("login");
 
-Route::middleware("auth")
-    ->group(function () {
-        Route::get("/", [DashboardController::class, "index"])->name("home");
-    });
+// Route::middleware("auth", "admin")
+//     ->group(function () {
+//         Route::get("/", function () {
+//             return redirect("admin");
+//         })->name("home");
+//     });
