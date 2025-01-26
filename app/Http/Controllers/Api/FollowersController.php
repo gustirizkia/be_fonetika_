@@ -30,6 +30,21 @@ class FollowersController extends Controller
         return response()->json($data);
     }
 
+    public function totalFollowers(Request $request)
+    {
+        $uuid = $request->user_uuid;
+        $id = Hashids::decode($uuid)[0] ?? null;
+        if (!$id) {
+            return response()->json([
+                'message' => "Data tidak ditemukan"
+            ], 404);
+        }
+
+        $data["total_followers"] = FollowerUser::where("user_id", $id)->count();
+
+        return response()->json($data);
+    }
+
     public function create(Request $request)
     {
 

@@ -6,6 +6,7 @@ use App\Models\Artikel;
 use App\Models\ArtikelKategori;
 use App\Models\ArtikelUtama;
 use App\Models\KomentarArtikel;
+use App\Models\TopikBerita;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -49,6 +50,7 @@ class SeederArtikel extends Seeder
         ]);
 
         $userNct = User::create([
+            "username" => "user_NCT",
             "name" => "user NCT",
             "email" => "user@nct.com",
             "password" => Hash::make("TeknikHijau1"),
@@ -59,7 +61,13 @@ class SeederArtikel extends Seeder
         for ($j = 0; $j < 14; $j++) {
             $faker = Faker::create('id_ID');
 
+            TopikBerita::create([
+                "slug" => $faker->slug(),
+                "nama" => $faker->sentence($nbWords = 2, $variableNbWords = true)
+            ]);
+
             $user = User::create([
+                "username" => $faker->userName(),
                 "name" => $faker->name(),
                 "email" => $faker->email(),
                 "password" => Hash::make("password"),

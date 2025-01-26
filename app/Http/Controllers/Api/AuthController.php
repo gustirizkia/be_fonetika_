@@ -2,16 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Artikel;
 use App\Models\User;
+use App\Models\Artikel;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Vinkla\Hashids\Facades\Hashids;
+use App\Http\Controllers\Controller;
+use App\Repositories\ArtikelRepository\ArtikelRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Vinkla\Hashids\Facades\Hashids;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+
+    protected $artikelRepository;
+
+    public function __construct(ArtikelRepositoryInterface $artikelRepository)
+    {
+        $this->artikelRepository = $artikelRepository;
+    }
+
     public function register(Request $request)
     {
         $validasi = Validator::make($request->all(), [
@@ -28,6 +39,7 @@ class AuthController extends Controller
         }
 
         $data = $request->all();
+        $data["username"] = Str::slug($request->name) . rand(1000, 9999);
         $data["password"] = Hash::make($request->password);
 
         $user = User::create($data);
@@ -71,16 +83,30 @@ class AuthController extends Controller
         ], 422);
     }
 
-    public function profile($uuid)
+    public function logoutFromAllDevices(Request $request)
     {
-        $id = Hashids::decode($uuid)[0] ?? null;
-        if (!$id) {
-            return response()->json([
-                'message' => "Data tidak ditemukan"
-            ], 404);
-        }
+        try {
+            // Dapatkan token yang sedang aktif
+            $token = JWTAuth::getToken();
 
-        $user = User::find($id);
+            // Invalidate semua token milik pengguna
+            JWTAuth::invalidate($token, true);
+
+            return response()->json([
+                'message' => 'Successfully logged out from all devices'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to logout',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function profile(Request $request, $uuid)
+    {
+
+        $user = User::where("username", $uuid)->first();
 
         if (!$user) {
             return response()->json([
@@ -88,9 +114,16 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $artikel = Artikel::where("user_id", $user->id)
-            ->select("slug", "nama", "is_publish", "image", "created_at")
-            ->paginate(18);
+        $this->artikelRepository->user_id = $user->id;
+
+        if ($request->search) {
+            $this->artikelRepository->search = $request->search;
+        }
+
+        $artikel = $this->artikelRepository->getArtikelTerkait(
+            null,
+            $request->limit
+        );
 
         $user->my_artikel = $artikel;
 
@@ -110,7 +143,11 @@ class AuthController extends Controller
         }
 
         if ($request->phone !== $user->phone && $request->phone !== null) {
-            $dataValidasi["email"] = "required|unique:users,phone";
+            $dataValidasi["phone"] = "required|unique:users,phone";
+        }
+
+        if ($request->username !== $user->username && $request->username !== null) {
+            $dataValidasi["username"] = "required|unique:users,username";
         }
 
         $validasi = Validator::make($request->all(), $dataValidasi);
@@ -121,7 +158,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $data = $request->only("name", "email", "phone", "image", "sampul", "bio");
+        $data = $request->only("name", "email", "phone", "image", "sampul", "bio", "username");
 
         if ($request->image) {
             $data["image"] = $request->image->store("user", 'public');

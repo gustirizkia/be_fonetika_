@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FollowersController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\KomentarController;
+use App\Http\Controllers\Api\LikeArtikelController;
+use App\Http\Controllers\Api\PageContentController;
 use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\TopikBeritaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,9 +46,16 @@ Route::get("profile/{uuid}", [AuthController::class, "profile"]);
 Route::get("komentar-by-artikel/{slug}", [KomentarController::class, "komentarByArtikel"]);
 
 Route::get("followers-by-user", [FollowersController::class, "byUser"]);
+Route::get("total-followers", [FollowersController::class, "totalFollowers"]);
 
 Route::post('/request-code', [PasswordResetController::class, 'forgotPassword']);
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
+
+Route::get("page-content", [PageContentController::class, "index"]);
+Route::get("page-content/{id}", [PageContentController::class, "show"]);
+
+Route::get("topik-berita", [TopikBeritaController::class, "index"]);
+
 
 Route::middleware("auth:api")
     ->group(function () {
@@ -57,4 +67,8 @@ Route::middleware("auth:api")
         Route::post("artikel-create", [ArtikelController::class, "create"]);
         Route::post("artikel-update", [ArtikelController::class, "updateArtikel"]);
         Route::delete("artikel-delete/{slug}", [ArtikelController::class, "hapus"]);
+
+        Route::post("like-artikel/{slug}", [LikeArtikelController::class, "create"]);
+
+        Route::post("logoutFromAllDevices", [AuthController::class, "logoutFromAllDevices"]);
     });

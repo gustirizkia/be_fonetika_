@@ -5,33 +5,53 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Artikel;
 use App\Models\ArtikelKategori;
+use App\Models\LikeArtikel;
 use App\Models\User;
+use App\Repositories\ArtikelRepository\ArtikelRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ArtikelController extends Controller
 {
-    public function show($slug)
+    protected $artikelRepository;
+
+    public function __construct(ArtikelRepositoryInterface $artikelRepository)
+    {
+        $this->artikelRepository = $artikelRepository;
+    }
+
+    public function show(Request $request, string $slug)
     {
         $item = Artikel::where("slug", $slug)
-            ->with("kategori")
+            ->with("kategori", "user")
             ->first();
 
-        $artikelTerkait = Artikel::where("kategori_id", $item->kategori_id)
-            ->where("id", "!=", $item->id)
-            ->select("slug", "nama", "image", "created_at")
-            ->limit(12)
-            ->get();
+        $sudah_like = false;
+
+        if (Auth::guard('api')->check()) {
+            $sudah_like = LikeArtikel::where("user_id", Auth::guard('api')->user()->id)
+                ->where("artikel_id", $item->id)
+                ->exists() ? true : false;
+        }
+
+        $this->artikelRepository->except_id = $item->id;
+
+        $artikelTerkait = $this->artikelRepository->getArtikelTerkait(
+            $item->kategori->slug,
+            $request->limit
+        );
 
         return response()->json([
             "data" => [
+                "sudah_like" => $sudah_like,
                 "detail_artikel" => $item,
                 "artikel_terkait" => $artikelTerkait
             ]
         ]);
     }
 
-    public function detailKategori($slug)
+    public function detailKategori(Request $request, $slug)
     {
         $kategori = ArtikelKategori::where("slug", $slug)->first();
         if (!$kategori) {
@@ -40,11 +60,10 @@ class ArtikelController extends Controller
             ], 404);
         }
 
-        $artikel = Artikel::where("kategori_id", $kategori->id)
-            ->select("slug", "nama", "image", "is_publish")
-            ->where("is_publish", 1)
-            ->orderBy("id", "desc")
-            ->paginate(12);
+        $artikel = $this->artikelRepository->getArtikelTerkait(
+            $kategori->slug,
+            $request->limit
+        );
 
         return response()->json([
             "data" => [
@@ -60,28 +79,12 @@ class ArtikelController extends Controller
 
         if ($request->search) {
             $data->where("nama", "LIKE", "%$request->search%");
+            $this->artikelRepository->search = $request->search;
         }
 
-        if ($request->kategori) {
-            $data = $data->filterKategoriSlug($request->kategori);
-        }
+        $this->artikelRepository->urutan = $request->ascending ? "asc" : "desc";
 
-        if ($request->ascending) {
-            $data = $data->orderBy("id", "asc");
-        } else {
-            $data = $data->orderBy("id", "desc");
-        }
-
-        $data = $data->with("kategori", "user")
-            ->select(
-                "slug",
-                "image",
-                "nama",
-                "created_at",
-                "user_id",
-                "kategori_id"
-            )
-            ->paginate(18);
+        $data = $this->artikelRepository->getArtikelTerkait($request->kategori, $request->limit);
 
         return response()->json([
             "data" => $data
@@ -91,7 +94,7 @@ class ArtikelController extends Controller
     public function artikelByUser(Request $request)
     {
         $validasi = Validator::make($request->all(), [
-            'email' => "required|email|exists:users,email"
+            'username' => "required|string|exists:users,username"
         ]);
 
         if ($validasi->fails()) {
@@ -100,19 +103,11 @@ class ArtikelController extends Controller
             ], 422);
         }
 
-        $user = User::where("email", $request->email)->first();
+        $user = User::where("username", $request->username)->first();
 
-        $artikel = Artikel::where("user_id", $user->id)
-            ->with("kategori", "user")
-            ->select(
-                "slug",
-                "image",
-                "nama",
-                "created_at",
-                "user_id",
-                "kategori_id"
-            )
-            ->paginate(12);
+        $this->artikelRepository->user_id = $user->id;
+
+        $artikel = $this->artikelRepository->getArtikelTerkait(null, $request->limit);
 
         return response()->json([
             "data" => [
