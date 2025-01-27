@@ -20,6 +20,7 @@ class KomentarController extends Controller
         }
 
         $items = KomentarArtikel::where("artikel_id", $artikel->id)
+            ->where("parent_id", null)
             ->with("child", "user")
             ->get();
 
