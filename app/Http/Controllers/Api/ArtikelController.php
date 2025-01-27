@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Artikel;
 use App\Models\ArtikelKategori;
+use App\Models\DailyIpAddress;
 use App\Models\LikeArtikel;
+use App\Models\PopulerByKategori;
 use App\Models\User;
 use App\Repositories\ArtikelRepository\ArtikelRepositoryInterface;
 use Illuminate\Http\Request;
@@ -21,11 +23,54 @@ class ArtikelController extends Controller
         $this->artikelRepository = $artikelRepository;
     }
 
+    public function saveIpAddress($ipAddress, $artikel)
+    {
+        $flag = base64_encode($ipAddress . " ; " . url()->current());
+
+        $saveIp = DailyIpAddress::where("ip_address", $ipAddress)
+            ->where("flag", $flag)
+            ->whereDate("created_at", now())
+            ->first();
+
+        if ($saveIp) {
+            return 1;
+        }
+
+        $saveIp =  DailyIpAddress::create([
+            "ip_address" => $ipAddress,
+            "flag" => $flag
+        ]);
+
+        /* Populer artikel */
+        $getPopuler = PopulerByKategori::where("artikel_id", $artikel->id)
+            ->where("kategori_id", $artikel->kategori_id)
+            ->first();
+
+        $insertPopuler = PopulerByKategori::updateOrCreate(
+            [
+                "artikel_id" => $artikel->id,
+                "kategori_id" => $artikel->kategori_id,
+            ],
+            [
+                "count" => $getPopuler ? $getPopuler->count + 1 : 1,
+            ]
+        );
+
+
+        return 1;
+    }
+
     public function show(Request $request, string $slug)
     {
         $item = Artikel::where("slug", $slug)
             ->with("kategori", "user")
             ->first();
+
+        if (!$item) {
+            return response()->json([
+                "message" => "data not found"
+            ], 404);
+        }
 
         $sudah_like = false;
 
@@ -34,6 +79,8 @@ class ArtikelController extends Controller
                 ->where("artikel_id", $item->id)
                 ->exists() ? true : false;
         }
+
+        $this->saveIpAddress($request->ip(), $item);
 
         $this->artikelRepository->except_id = $item->id;
 
@@ -75,6 +122,7 @@ class ArtikelController extends Controller
 
     public function index(Request $request)
     {
+
         $data = Artikel::query();
 
         if ($request->search) {
