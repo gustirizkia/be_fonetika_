@@ -7,7 +7,7 @@ use App\Models\Artikel;
 class ArtikelRepository implements ArtikelRepositoryInterface
 {
     public $urutan = "desc";
-    public $search = null, $except_id = null, $user_id = null;
+    public $search = null, $except_id = null, $user_id = null, $topik = null;
 
     public function getArtikelTerkait($kategoriId, $limit)
     {
@@ -33,6 +33,14 @@ class ArtikelRepository implements ArtikelRepositoryInterface
             ->when($this->user_id, function ($query) {
                 return $query->where("user_id", $this->user_id);
             })
+            ->when($this->topik, function ($query) {
+                return $query->filterTopik($this->topik);
+            })
             ->paginate($limit ?? 18);
+    }
+
+    public function setTopik(array $param)
+    {
+        $this->topik = $param;
     }
 }

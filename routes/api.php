@@ -55,6 +55,7 @@ Route::get("page-content", [PageContentController::class, "index"]);
 Route::get("page-content/{id}", [PageContentController::class, "show"]);
 
 Route::get("topik-berita", [TopikBeritaController::class, "index"]);
+Route::get("topik-berita/{id}", [TopikBeritaController::class, "show"]);
 
 
 Route::middleware("auth:api")

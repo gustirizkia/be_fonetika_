@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Artikel;
+use App\Models\ArtikelHasTopik;
 use App\Models\ArtikelKategori;
 use App\Models\ArtikelUtama;
 use App\Models\KomentarArtikel;
@@ -58,13 +59,17 @@ class SeederArtikel extends Seeder
             "roles" => "admin"
         ]);
 
-        for ($j = 0; $j < 14; $j++) {
+        for ($t = 0; $t < 40; $t++) {
             $faker = Faker::create('id_ID');
 
             TopikBerita::create([
                 "slug" => $faker->slug(),
                 "nama" => $faker->sentence($nbWords = 2, $variableNbWords = true)
             ]);
+        }
+
+        for ($j = 0; $j < 14; $j++) {
+            $faker = Faker::create('id_ID');
 
             $user = User::create([
                 "username" => $faker->userName(),
@@ -90,7 +95,15 @@ class SeederArtikel extends Seeder
                     "is_publish" => 1
                 ]);
 
-                for ($x = 0; $x < 20; $x++) {
+                for ($x = 0; $x < 6; $x++) {
+
+                    $topik = TopikBerita::inRandomOrder()->first()->id;
+
+                    ArtikelHasTopik::create([
+                        "artikel_id" => $insert->id,
+                        "topik_id" => $topik
+                    ]);
+
                     $komentar = KomentarArtikel::create([
                         "artikel_id" => $insert->id,
                         "user_id" => $user->id,

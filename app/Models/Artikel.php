@@ -24,6 +24,19 @@ class Artikel extends Model
         return $this->belongsTo(ArtikelKategori::class, "kategori_id", "id");
     }
 
+    public function topik()
+    {
+        return $this->hasMany(ArtikelHasTopik::class, "artikel_id", "id");
+    }
+
+    public function scopeFilterTopik($query, array $id)
+    {
+        return $query->whereHas("topik", function ($q) use ($id) {
+
+            return $q->whereIn("topik_id", $id);
+        });
+    }
+
     public function scopeFilterKategoriSlug($query, $slug)
     {
         return $query->whereHas("kategori", function ($q) use ($slug) {
