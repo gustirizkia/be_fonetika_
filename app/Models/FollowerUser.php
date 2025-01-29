@@ -13,4 +13,11 @@ class FollowerUser extends Model
     {
         return $this->belongsTo(User::class, "user_id", "id");
     }
+
+    public function scopeFilterByUserName($query, $user_name)
+    {
+        return $query->whereHas("user", function ($query) use ($user_name) {
+            $query->where("username", $user_name);
+        });
+    }
 }

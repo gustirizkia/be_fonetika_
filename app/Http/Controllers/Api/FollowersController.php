@@ -14,15 +14,9 @@ class FollowersController extends Controller
     public function byUser(Request $request)
     {
         $uuid = $request->user_uuid;
-        $id = Hashids::decode($uuid)[0] ?? null;
-        if (!$id) {
-            return response()->json([
-                'message' => "Data tidak ditemukan"
-            ], 404);
-        }
 
-        $data["followers_user"] = FollowerUser::where("user_id", $id)
-            ->with("user")
+        $data["followers_user"] = FollowerUser::with("user")
+            ->filterByUserName($uuid)
             ->paginate(18);
 
         $data["is_follow"] = $data["followers_user"]->where("created_by", Auth::guard("api")->user()->id  ?? null)->first() ? true : false;
@@ -32,15 +26,9 @@ class FollowersController extends Controller
 
     public function totalFollowers(Request $request)
     {
-        $uuid = $request->user_uuid;
-        $id = Hashids::decode($uuid)[0] ?? null;
-        if (!$id) {
-            return response()->json([
-                'message' => "Data tidak ditemukan"
-            ], 404);
-        }
+        $user_name = $request->user_uuid;
 
-        $data["total_followers"] = FollowerUser::where("user_id", $id)->count();
+        $data["total_followers"] = FollowerUser::where("user_id", $user_name)->count();
 
         return response()->json($data);
     }
@@ -55,19 +43,14 @@ class FollowersController extends Controller
         }
 
         $uuid = $request->user_uuid;
-        $id = Hashids::decode($uuid)[0] ?? null;
-        if (!$id) {
-            return response()->json([
-                'message' => "Data tidak ditemukan"
-            ], 404);
-        }
 
-        $user = User::where("id", $id)->first();
+        $user = User::where("username", $uuid)->first();
 
         $message = "Berhasil mengikut $user->name";
 
-        $follow = FollowerUser::where("user_id", $id)
-            ->where("created_by", auth()->user()->id ?? null)->first();
+        $follow = FollowerUser::where("created_by", auth()->user()->id ?? null)
+            ->filterByUserName($uuid)
+            ->first();
 
         if ($follow) {
             $message = "Berhasil berhenti mengikuti $user->name";
@@ -76,7 +59,7 @@ class FollowersController extends Controller
         } else {
             FollowerUser::create([
                 "created_by" => auth()->user()->id,
-                "user_id" => $id,
+                "user_id" => $user->id,
             ]);
         }
 

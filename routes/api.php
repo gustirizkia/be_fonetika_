@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ArtikelController;
+use App\Http\Controllers\Api\ArtikelPopulerController;
 use App\Http\Controllers\Api\ArtikelUtamaController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FollowersController;
@@ -40,6 +41,8 @@ Route::get("artikel-utama", [ArtikelUtamaController::class, "index"]);
 Route::get("artikel-rekomendasi", [ArtikelUtamaController::class, "rekomendasi"]);
 Route::get("artikelByUser", [ArtikelController::class, "artikelByUser"]);
 Route::get("artikel/{slug}", [ArtikelController::class, "show"]);
+
+Route::get("artikel-populer", [ArtikelPopulerController::class, "index"]);
 
 Route::get("profile/{uuid}", [AuthController::class, "profile"]);
 

@@ -50,6 +50,8 @@ class KomentarController extends Controller
 
         $komentar = KomentarArtikel::create($data);
 
+        $komentar->load('user');
+
         return response()->json([
             "data" => $komentar
         ], 201);
