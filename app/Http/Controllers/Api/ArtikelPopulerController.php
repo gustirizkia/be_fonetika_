@@ -14,7 +14,7 @@ class ArtikelPopulerController extends Controller
 
         if ($slug_kategori) {
             $items = PopulerByKategori::with(["artikel" => function ($query) {
-                return $query->select('id', 'slug', 'nama', 'keyword', 'kategori_id', 'user_id')
+                return $query->select('id', 'slug', 'nama', 'keyword', 'kategori_id', 'user_id', "image")
                     ->with("kategori", "user");
             }])
                 ->whereHas("artikel", function ($query) use ($slug_kategori) {
@@ -26,7 +26,7 @@ class ArtikelPopulerController extends Controller
                 ->paginate($request->limit ?? 10);
         } else {
             $items = PopulerByKategori::with(["artikel" => function ($query) {
-                return $query->select('id', 'slug', 'nama', 'keyword', 'kategori_id', 'user_id')
+                return $query->select('id', 'slug', 'nama', 'keyword', 'kategori_id', 'user_id', "image")
                     ->with("kategori", "user");
             }])
                 ->orderBy("count", "desc")
