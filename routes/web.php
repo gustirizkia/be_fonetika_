@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DeepSeek\DetectContentSaraController;
 use App\Http\Controllers\Frontend\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,8 @@ Route::get("token-verify", [DashboardController::class, "tokenVerify"]);
 Route::get("login", function () {
     return redirect("https://fonetika-fe.vercel.app/");
 })->name("login");
+
+Route::get("sara/{id}", [DetectContentSaraController::class, "index"]);
 
 // Route::middleware("auth", "admin")
 //     ->group(function () {

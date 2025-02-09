@@ -18,7 +18,8 @@ class ArtikelRepository implements ArtikelRepositoryInterface
                 "image",
                 "created_at",
                 "user_id",
-                "kategori_id"
+                "kategori_id",
+                "is_sara"
             )
             ->orderBy("id", $this->urutan)
             ->when($this->search, function ($query) {
